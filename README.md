@@ -65,3 +65,96 @@
 
    - Buscar pelo identificador único
       - db.cliente.find({_id: ObjectId('6a7bbab007ff2cf8649f68a9'),})
+
+# Relacionamentos   
+## Relacionamento One-to-One (1:1)
+Ocorre quando um registro se relaciona exclusivamente com outro único registro [8].
+
+**Embarcado (Embedded):** Indicado quando os dados pertencem exclusivamente àquela entidade e são lidos juntos [8].
+javascript
+Exemplo: Paciente ↔ Doença (Resumo médico)
+db.patients.insertOne({
+  name: "Jefté",
+  age: 35,
+  diseaseSummary: {
+    diseases: ["cold", "broken leg"]
+  }
+})
+
+
+
+**Por Referência:** Indicado quando as entidades possuem vida autônoma na aplicação[4].
+
+
+ Exemplo: Pessoa ↔ Carro
+db.persons.insertOne({
+  name: "Jefté",
+  age: 35,
+  salary: 3000
+})
+
+db.cars.insertOne({
+  model: "BMW",
+  price: 40000,
+  owner: ObjectId('6aa9e2cee9c288ce1241317e')
+})
+
+
+
+
+## 2\. Relacionamento One-to-Many (1:N)
+
+Ocorre quando um único registro se relaciona com múltiplos registros secundários[5].
+
+**Embarcado (Embedded):** Armazena as entidades dependentes dentro de um array de objetos[5][6].
+
+Exemplo: Tópico ↔ Respostas
+db.questionThreads.insertOne({
+  creator: "Jefté",
+  question: "How does that work?",
+  answers: [
+    { text: "Like that." },
+    { text: "Thanks!" }
+  ]
+})
+
+
+ **Por Referência:** Usado quando a subcoleção pode crescer indefinidamente, evitando estourar o **limite de 16MB por documento**[7][5].
+
+
+ Exemplo: Cidade ↔ Cidadãos
+db.cities.insertOne({
+  name: "New York City",
+  coordinates: { lat: 21, lng: 55 }
+})
+
+db.citizens.insertMany([
+  { name: "Jefté Goes", cityId: ObjectId("5b98d6b44d01c52e1637a99f") },
+  { name: "Brenno Salvador", cityId: ObjectId("5b98d6b44d01c52e1637a99f") }
+])
+
+
+
+
+## 3 Relacionamento Many-to-Many (N:M)
+
+Ocorre quando múltiplos registros de uma coleção se associam a múltiplos registros de outra[8].
+
+ **Embarcado (Embedded):** O histórico de itens é congelado dentro do próprio documento do cliente[8].
+ Exemplo: Cliente ↔ Pedidos
+db.customers.insertOne({
+  name: "Jefté",
+  age: 35
+})
+
+db.customers.updateOne(
+  {},
+  { $set: { orders: [{ title: "A Book", price: 12.99, quantity: 2 }] } }
+)
+
+
+
+**Por Referência:** Utiliza um array de ObjectId para relacionamentos cruzados[8][9].
+
+
+
